@@ -7,7 +7,7 @@ synth = results
 route_dir = route
 testbenches = testbenches/$(top_exe)_tb.cpp
 
-flags = -cc --exe -x-assign fast --trace --build -j 0 -Wall
+flags = -cc --exe -x-assign fast --trace --build -j 0 
 
 default: testbench
 	
