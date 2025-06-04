@@ -69,6 +69,7 @@ int main(int argc, char const *argv[])
 
             if (smm0->clk) { 
                 C = A * B;
+                std::cout << "C1: \n"  << C << std::endl;
                 for (int i = 0; i < N; i++)
                     for (int j = 0; j < M; j++) 
                         C2(i, j)  = smm0->C_out.at((N * M - 1) - (i * N + j));
@@ -96,6 +97,7 @@ int main(int argc, char const *argv[])
 
             if (smm0->clk) { 
                 C = A * B2;
+                std::cout << "C1: \n"  << C << std::endl;
                 for (int i = 0; i < N; i++)
                     for (int j = 0; j < M; j++) 
                         C2(i, j)  = smm0->C_out.at((N * M - 1) - (i * N + j));

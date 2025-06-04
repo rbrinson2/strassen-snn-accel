@@ -1,41 +1,40 @@
-`define TEST 'b01
-
 
 module SMM0
 #(
-    parameter DATAWIDTH = 32 * 4,
-    parameter BLOCKSIZE = 32
+    parameter DATAWIDTH = 32,
+    parameter BLOCKSIZE = DATAWIDTH * 1,
+    parameter BUSWIDTH = BLOCKSIZE  * 4
 )    
 (
     input clk, rst,
-    input signed [DATAWIDTH - 1:0] A, B,
+    input signed [BUSWIDTH - 1:0] A, B,
     input load, sel,
 
-    output reg [DATAWIDTH - 1 :0] C_out
+    output reg [BUSWIDTH - 1 :0] C_out
 
 );
 
-    localparam BLOCK_0 = BLOCKSIZE - 1, BLOCK_1 = 2 * BLOCKSIZE -  1, BLOCK_2 = 3 * BLOCKSIZE - 1, BLOCK_3 = DATAWIDTH - 1; 
+    localparam BLOCK_0 = DATAWIDTH - 1, BLOCK_1 = 2 * DATAWIDTH -  1, BLOCK_2 = 3 * DATAWIDTH - 1, BLOCK_3 = 4 * DATAWIDTH - 1; 
 
     integer i, j;
 
-    reg signed [BLOCKSIZE - 1:0] C [4];
-    reg signed [BLOCKSIZE - 1:0] T [7];
-    reg signed [BLOCKSIZE - 1:0] S [7];
-    reg signed [BLOCKSIZE - 1:0] M [7];
+    reg signed [DATAWIDTH - 1:0] C [4];
+    reg signed [DATAWIDTH - 1:0] T [7];
+    reg signed [DATAWIDTH - 1:0] S [7];
+    reg signed [DATAWIDTH - 1:0] M [7];
     
     always @(posedge clk) begin
         if (rst) for (i = 0; i < 7; i = i + 1) T[i] <= 'b0;
         else if (load) begin
-            T[1] <= A[BLOCK_2 -: BLOCKSIZE] + A[BLOCK_3 -: BLOCKSIZE];
-            T[2] <= A[BLOCK_0 -: BLOCKSIZE];
-            T[3] <= A[BLOCK_3 -: BLOCKSIZE];
-            T[4] <= A[BLOCK_0 -: BLOCKSIZE] + A[BLOCK_1 -: BLOCKSIZE];
+            T[1] <= A[BLOCK_2 -: DATAWIDTH] + A[BLOCK_3 -: DATAWIDTH];
+            T[2] <= A[BLOCK_0 -: DATAWIDTH];
+            T[3] <= A[BLOCK_3 -: DATAWIDTH];
+            T[4] <= A[BLOCK_0 -: DATAWIDTH] + A[BLOCK_1 -: DATAWIDTH];
 
             if (!sel) begin 
-                T[0] <= A[BLOCK_0 -: BLOCKSIZE] + A[BLOCK_3 -: BLOCKSIZE];
-                T[5] <= A[BLOCK_2 -: BLOCKSIZE] - A[BLOCK_0 -: BLOCKSIZE];
-                T[6] <= A[BLOCK_1 -: BLOCKSIZE] - A[BLOCK_3 -: BLOCKSIZE]; 
+                T[0] <= A[BLOCK_0 -: DATAWIDTH] + A[BLOCK_3 -: DATAWIDTH];
+                T[5] <= A[BLOCK_2 -: DATAWIDTH] - A[BLOCK_0 -: DATAWIDTH];
+                T[6] <= A[BLOCK_1 -: DATAWIDTH] - A[BLOCK_3 -: DATAWIDTH]; 
             end
         end
     end
@@ -93,9 +92,9 @@ module SMM0
     
 
 
-    initial begin
-        $dumpfile("logs/top_dump.vcd");
-        $dumpvars();
-    end
+    // initial begin
+    //     $dumpfile("logs/top_dump.vcd");
+    //     $dumpvars();
+    // end
     
 endmodule

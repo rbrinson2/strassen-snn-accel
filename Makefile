@@ -1,7 +1,8 @@
 
 top_exe = SMM0
 source_dir = src
-sources = $(source_dir)/SMM0.v
+sources = $(source_dir)/SMM1.v $(source_dir)/SMM0.v 
+top_module = --top $(top_exe)
 synth_dir = synth
 synth = results
 route_dir = route
@@ -19,7 +20,7 @@ testbench:
 
 
 	# --------------------------------------------- Verilate
-	verilator $(flags) $(sources) $(testbenches)	
+	verilator $(flags) $(sources) $(testbenches) $(top_module)	
 	mkdir -p logs
 	obj_dir/V$(top_exe) +trace
 
