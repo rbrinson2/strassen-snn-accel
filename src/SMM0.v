@@ -85,7 +85,7 @@ module SMM0
     always @(posedge clk) begin
         if (rst) C_out <= 'b0;
         else begin
-            if (!sel)   C_out <= {C[0], C[1], C[2], C[3]};
+            if (!sel)   C_out <= {C[3], C[2], C[1], C[0]};
             else        C_out <= {C[1], 32'b0, C[2], 32'b0};
         end
     end

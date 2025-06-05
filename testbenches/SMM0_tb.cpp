@@ -72,7 +72,7 @@ int main(int argc, char const *argv[])
                 std::cout << "C1: \n"  << C << std::endl;
                 for (int i = 0; i < N; i++)
                     for (int j = 0; j < M; j++) 
-                        C2(i, j)  = smm0->C_out.at((N * M - 1) - (i * N + j));
+                        C2(i, j)  = smm0->C_out.at(i * N + j);
 
                 std::cout << "C2: \n" << C2 << std::endl;
             }

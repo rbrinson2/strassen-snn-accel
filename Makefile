@@ -1,5 +1,5 @@
 
-top_exe = SMM0
+top_exe = SMM1
 source_dir = src
 sources = $(source_dir)/SMM1.v $(source_dir)/SMM0.v 
 top_module = --top $(top_exe)
@@ -25,7 +25,7 @@ testbench:
 	obj_dir/V$(top_exe) +trace
 
 	# --------------------------------------------- GTKWave
-	gtkwave logs/top_dump.vcd
+	# gtkwave logs/top_dump.vcd
 
 .PHONEY: clean
 clean:
