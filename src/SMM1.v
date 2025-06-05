@@ -47,9 +47,11 @@ module SMM1
     wire [BLOCKSIZE - 1:0] B_10;
     wire [BLOCKSIZE - 1:0] B_11;
 
-    reg signed [BLOCKSIZE - 1:0] C [4];
-    reg signed [BLOCKSIZE - 1:0] T [7];
-    reg signed [BLOCKSIZE - 1:0] S [7];
+    wire [BLOCKSIZE - 1:0] M_wire [7:0];
+
+    reg signed [BLOCKSIZE - 1:0] C [3:0];
+    reg signed [BLOCKSIZE - 1:0] T [6:0];
+    reg signed [BLOCKSIZE - 1:0] S [6:0];
     reg signed [BLOCKSIZE - 1:0] M [7];
 
     integer i, j;
@@ -119,7 +121,13 @@ module SMM1
             );
         end
     endgenerate
-    
+
+    always begin
+        M[0] <= M_wire[0];
+        M[1] <= M_wire[1];
+        M[2] <= M_wire[2];
+        M[3] <= M_wire[3];
+    end    
 
     // C Additions ------------------------------------------------------------------------------ //
     always @(M) begin
@@ -143,7 +151,10 @@ module SMM1
                 {C_out[BLOCK_11_UPPER -: BLOCKWIDTH], C_out[BLOCK_11_LOWER -: BLOCKWIDTH]} <= C[3];
             end
             else        
-                C_out <= {C[1], 128'b0, C[2], 128'b0};
+                {C_out[BLOCK_00_UPPER -: BLOCKWIDTH], C_out[BLOCK_00_LOWER -: BLOCKWIDTH]} <= C[1];
+                {C_out[BLOCK_01_UPPER -: BLOCKWIDTH], C_out[BLOCK_01_LOWER -: BLOCKWIDTH]} <= 'b0;
+                {C_out[BLOCK_10_UPPER -: BLOCKWIDTH], C_out[BLOCK_10_LOWER -: BLOCKWIDTH]} <= C[2];
+                {C_out[BLOCK_11_UPPER -: BLOCKWIDTH], C_out[BLOCK_11_LOWER -: BLOCKWIDTH]} <= 'b0;
         end
     end
     

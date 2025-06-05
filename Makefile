@@ -8,7 +8,7 @@ synth = results
 route_dir = route
 testbenches = testbenches/$(top_exe)_tb.cpp
 
-flags = -cc --exe -x-assign fast --trace --build -j 0 
+flags = -cc --exe -x-assign fast --trace --build -j 0 -Wno-fatal 
 
 default: testbench
 	
@@ -25,7 +25,7 @@ testbench:
 	obj_dir/V$(top_exe) +trace
 
 	# --------------------------------------------- GTKWave
-	# gtkwave logs/top_dump.vcd
+	gtkwave logs/top_dump.vcd
 
 .PHONEY: clean
 clean:
