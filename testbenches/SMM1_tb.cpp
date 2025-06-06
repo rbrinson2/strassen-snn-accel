@@ -22,6 +22,7 @@ int main(int argc, char const *argv[])
     arma::Col<uint32_t> B2(4, arma::fill::ones);
     arma::Mat<uint32_t> C(4, 4, arma::fill::zeros);
     arma::Mat<uint32_t> C2(4, 4, arma::fill::zeros);
+    arma::Mat<uint32_t> C3(4, 4, arma::fill::zeros);
 
     std::random_device rnd_device;
     std::mt19937 mersenne_engine {rnd_device()};  // Generates random integers
@@ -85,6 +86,9 @@ int main(int argc, char const *argv[])
     }
 
     std::cout << "// ------------------------ Matrix x Vector -------------------------------------- //" << std::endl;
+    A = {{1,2,3,4},{5,6,7,8},{9,10,11,12},{13,14,15,16}};
+    B.zeros();
+    B.col(0) = {1,1,1,1};
     for (int i = 0; i < 1; i++){
         std::cout << "// ------------------------ Epoch " << i + 1 << " -------------------------------------- //" << std::endl;
 
@@ -104,7 +108,7 @@ int main(int argc, char const *argv[])
             else smm1->rst = 0;
 
             fill_A(smm1, A);
-            fill_B(smm1, B2); 
+            fill_B(smm1, B); 
 
 
             smm1->eval();
@@ -117,12 +121,16 @@ int main(int argc, char const *argv[])
 
         C = A * B2;
         std::cout << "C1: \n" << C << std::endl;
-        fill_C(smm1, C2);
-        std::cout <<"C2: \n" << C2 << std::endl;
+        fill_C(smm1, C3);
+        std::cout <<"C3: \n" << C3 << std::endl;
 
         A.for_each([&](arma::Mat<uint32_t>::elem_type &val){ val = dist(mersenne_engine); });
         B.for_each([&](arma::Mat<uint32_t>::elem_type &val){ val = dist(mersenne_engine); });
     }
+    
+
+
+
     smm1->final();
     return 0;
 }
