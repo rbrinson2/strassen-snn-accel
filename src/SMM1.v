@@ -47,9 +47,11 @@ module SMM1
     wire [BLOCKSIZE - 1:0] B_10;
     wire [BLOCKSIZE - 1:0] B_11;
 
-    reg signed [BLOCKSIZE - 1:0] C [4];
-    reg signed [BLOCKSIZE - 1:0] T [7];
-    reg signed [BLOCKSIZE - 1:0] S [7];
+    wire [BLOCKSIZE - 1:0] M_wire [7:0];
+
+    reg signed [BLOCKSIZE - 1:0] C [3:0];
+    reg signed [BLOCKSIZE - 1:0] T [6:0];
+    reg signed [BLOCKSIZE - 1:0] S [6:0];
     reg signed [BLOCKSIZE - 1:0] M [7];
 
     integer i, j;
@@ -87,15 +89,42 @@ module SMM1
     always @(posedge clk) begin
         if (rst) for (j = 0; j < 7; j = j + 1) S[j] <= 'b0;
         else if(load) begin
-            S[1] <= B_00;
-            S[2] <= mat_sub(B_01, B_11);
-            S[3] <= mat_sub(B_10, B_00);
-            S[4] <= B_11;
+            case (sel)
+                0 : begin
+                    S[0] <= mat_add(B_00, B_11); 
+                    S[1] <= B_00;
+                    S[2] <= mat_sub(B_01, B_11);
+                    S[3] <= mat_sub(B_10, B_00);
+                    S[4] <= B_11;
+                    S[5] <= mat_add(B_00, B_01);
+                    S[6] <= mat_add(B_10, B_11);
+                end
+                1 : begin
+                    S[0] <= 'b0; 
+                    S[1] <= B_00;
+                    S[2] <= mat_sub(B_00, B_10);
+                    S[3] <= mat_sub(B_10, B_00);
+                    S[4] <= B_11;
+                    S[5] <= 'b0;
+                    S[6] <= 'b0;
+                end
+                default : begin
+                    S[0] <= 'b0; 
+                    S[1] <= 'b0;
+                    S[2] <= 'b0;
+                    S[3] <= 'b0;
+                    S[4] <= 'b0;
+                    S[5] <= 'b0;
+                    S[6] <= 'b0;
+                end
+            endcase
+            
 
             if (!sel) begin
-                S[0] <= mat_add(B_00, B_11); 
-                S[5] <= mat_add(B_00, B_01);
-                S[6] <= mat_add(B_10, B_11);
+            end
+            if ($time == 11) begin
+                $display("time: %0t, S0: 0x%0h, S1: 0x%0h, S2: 0x%0h, S3: 0x%0h, S4: 0x%0h, S5: 0x%0h, S6: 0x%0h",$time, S[0], S[1], S[2], S[3], S[4], S[5], S[6]);
+                $display("\t  B00: 0x%0h, B01: 0x%0h, B10: 0x%0h, B11: 0x%0h", B_00, B_01, B_10, B_11);
             end
         end
     end
@@ -119,7 +148,13 @@ module SMM1
             );
         end
     endgenerate
-    
+
+    always begin
+        M[0] <= M_wire[0];
+        M[1] <= M_wire[1];
+        M[2] <= M_wire[2];
+        M[3] <= M_wire[3];
+    end    
 
     // C Additions ------------------------------------------------------------------------------ //
     always @(M) begin
@@ -143,14 +178,17 @@ module SMM1
                 {C_out[BLOCK_11_UPPER -: BLOCKWIDTH], C_out[BLOCK_11_LOWER -: BLOCKWIDTH]} <= C[3];
             end
             else        
-                C_out <= {C[1], 128'b0, C[2], 128'b0};
+                {C_out[BLOCK_00_UPPER -: BLOCKWIDTH], C_out[BLOCK_00_LOWER -: BLOCKWIDTH]} <= C[0];
+                {C_out[BLOCK_01_UPPER -: BLOCKWIDTH], C_out[BLOCK_01_LOWER -: BLOCKWIDTH]} <= C[1];
+                {C_out[BLOCK_10_UPPER -: BLOCKWIDTH], C_out[BLOCK_10_LOWER -: BLOCKWIDTH]} <= C[2];
+                {C_out[BLOCK_11_UPPER -: BLOCKWIDTH], C_out[BLOCK_11_LOWER -: BLOCKWIDTH]} <= C[3];
         end
     end
     
 
 
     // initial begin
-    //     $dumpfile("logs/top_dump.vcd");
+    //     $dumpfile("logs/mat_dump.vcd");
     //     $dumpvars();
     // end
     

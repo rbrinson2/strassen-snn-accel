@@ -18,10 +18,10 @@ module SMM0
 
     integer i, j;
 
-    reg signed [DATAWIDTH - 1:0] C [4];
-    reg signed [DATAWIDTH - 1:0] T [7];
-    reg signed [DATAWIDTH - 1:0] S [7];
-    reg signed [DATAWIDTH - 1:0] M [7];
+    reg signed [DATAWIDTH - 1:0] C [3:0];
+    reg signed [DATAWIDTH - 1:0] T [6:0];
+    reg signed [DATAWIDTH - 1:0] S [6:0];
+    reg signed [DATAWIDTH - 1:0] M [6:0];
     
     always @(posedge clk) begin
         if (rst) for (i = 0; i < 7; i = i + 1) T[i] <= 'b0;
