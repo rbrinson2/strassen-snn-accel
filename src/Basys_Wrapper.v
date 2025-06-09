@@ -21,31 +21,49 @@
 
 
 module Basys_Wrapper(
-    input clk, btnC,
+    input clk, btnU, btnC, sw,
 
-    output reg [7:0] led
+    output reg [15:0] led
 );
-
+    localparam DATAWIDTH = 32;
     
+    localparam [DATAWIDTH * 16 - 1:0] A = {
+        32'h16,32'h15,32'h14,32'h13,
+        32'h12,32'h11,32'h10,32'h9,
+        32'h8,32'h7,32'h6,32'h5,
+        32'h4,32'h3,32'h2,32'h1
+    };
+    localparam [DATAWIDTH * 16 - 1:0] B = {
+        32'h1,32'h2,32'h3,32'h4,
+        32'h5,32'h6,32'h7,32'h8,
+        32'h9,32'h10,32'h11,32'h12,
+        32'h13,32'h14,32'h15,32'h16
+    };
+    
+    reg [DATAWIDTH * 16 - 1:0] C;
+    wire [DATAWIDTH * 16 - 1:0] C_wire;
+
     SMM1 #(
-        .DATAWIDTH(32),
+        .DATAWIDTH(DATAWIDTH),
         .BLOCKSIZE(),
         .BUSWIDTH()
     ) SMM1_instance (
         .clk(clk),
-        .rst(btnC),
-        .A('b0),
-        .B('b0),
-        .load('b1),
-        .sel('b1),
-        .C_out()
+        .rst(btnU),
+        .A(A),
+        .B(B),
+        .load(btnC),
+        .sel(sw),
+        .C_out(C_wire)
     );
+
+    always @(C) C = C_wire;
 
     integer i;
     always @(posedge clk) begin
-        for (i = 0; i < 8; i = i + 1) begin
-            if (i % 2 == 0) led[i] <= 1'b1;
-            else if (i % 2 == 1) led[i] <= 1'b0;
+        for (i = 0; i < 16; i = i + 1) begin
+            if (C[i * DATAWIDTH +: DATAWIDTH] > 32'd250) led[i] <= 1'b1;
+            else led[i] <= 1'b0;
         end
     end
 
