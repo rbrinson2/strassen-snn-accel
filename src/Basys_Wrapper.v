@@ -40,8 +40,8 @@ module Basys_Wrapper(
         32'h13,32'h14,32'h15,32'h16
     };
     
-    reg [DATAWIDTH * 16 - 1:0] C;
-    wire [DATAWIDTH * 16 - 1:0] C_wire;
+    reg [DATAWIDTH - 1 : 0] C [15:0];
+    wire [DATAWIDTH * 16 - 1 : 0] C_wire;
 
     SMM1 #(
         .DATAWIDTH(DATAWIDTH),
@@ -57,28 +57,17 @@ module Basys_Wrapper(
         .C_out(C_wire)
     );
 
-    always @(C) C = C_wire;
-
+    integer j;
+    always @(*) begin
+        for (j = 0; j < 16; j = j + 1) begin
+            C[j] <= C_wire[j * DATAWIDTH +: DATAWIDTH];
+        end
+    end
+    
     integer i;
     always @(posedge clk) begin
         for (i = 0; i < 16; i = i + 1) begin
-            if (C[i * DATAWIDTH +: DATAWIDTH] == 80) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 80) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 70) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 60) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 50) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 240) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 214) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 188) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 162) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 400) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 358) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 316) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 274) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 560) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 502) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 444) led[i] <= 1'b1;
-            else if (C[i * DATAWIDTH +: DATAWIDTH] == 386) led[i] <= 1'b1;
+            if (C[i] >= 32'd1) led[i] <= 1'b1;
             else led[i] <= 1'b0;
         end
     end
