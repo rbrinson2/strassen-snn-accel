@@ -71,14 +71,22 @@ module SMM0
         end
     end
 
+    integer count;
     always @(posedge clk) begin
-        M[0] <= sel ? 'b0 : T[0] * S[0];
-        M[1] <= T[1] * S[1];
-        M[2] <= T[2] * S[2];
-        M[3] <= T[3] * S[3];
-        M[4] <= T[4] * S[4];
-        M[5] <= sel ? 'b0 : T[5] * S[5];
-        M[6] <= sel ? 'b0 : T[6] * S[6];
+        if (rst) begin
+            for (i = 0; i < 7; i = i + 1) M[i] <= 'b0;
+            count = 0;
+        end
+
+        if (count == 0)      M[0] <= sel ? 'b0 : T[0] * S[0];
+        else if (count == 5) M[5] <= sel ? 'b0 : T[5] * S[5];
+        else if (count == 6) M[6] <= sel ? 'b0 : T[6] * S[6];
+        else begin
+            M[count] <= T[count] * S[count];
+        end
+
+        count = count + 1;
+        if (count == 7) count = 0;
     end
     
     

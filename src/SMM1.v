@@ -137,7 +137,7 @@ module SMM1
     generate
         for (i_gen = 0; i_gen < 7; i_gen = i_gen + 1) begin : multiply
             SMM0 #(
-                .DATAWIDTH(),
+                .DATAWIDTH(DATAWIDTH),
                 .BLOCKSIZE(),
                 .BUSWIDTH()
             ) SMM0_instance (
