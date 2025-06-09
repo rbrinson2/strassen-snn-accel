@@ -1,9 +1,7 @@
 
 module SMM0
 #(
-    parameter DATAWIDTH = 32,
-    parameter BLOCKSIZE = DATAWIDTH * 1,
-    parameter BUSWIDTH = BLOCKSIZE  * 4
+    parameter DATAWIDTH = 32
 )    
 (
     input clk, rst,
@@ -13,7 +11,8 @@ module SMM0
     output reg [BUSWIDTH - 1 :0] C_out
 
 );
-
+    localparam BLOCKSIZE = DATAWIDTH * 1;
+    localparam BUSWIDTH = BLOCKSIZE  * 4;
     localparam BLOCK_00 = DATAWIDTH - 1, BLOCK_01 = DATAWIDTH * 2 - 1, BLOCK_10 = DATAWIDTH * 3 - 1, BLOCK_11 = DATAWIDTH * 4 - 1; 
 
     wire [BLOCKSIZE - 1:0] A_00;
