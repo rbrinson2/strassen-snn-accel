@@ -151,7 +151,7 @@ module SMM1
     endgenerate
 
     // C Additions ------------------------------------------------------------------------------ //
-    always @(M) begin
+    always @(posedge clk) begin
         if (!sel) begin
             C[0] <= mat_add(mat_sub(mat_add(M[0], M[3]), M[4]), M[6]); 
             C[1] <= mat_add(M[2], M[4]); 
