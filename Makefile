@@ -1,7 +1,7 @@
 
 top_exe = SMM1
 source_dir = src
-sources = $(source_dir)/SMM1.v $(source_dir)/SMM0.v 
+sources = $(source_dir)/SMM1.v $(source_dir)/SMM0.v $(source_dir)/SMM0_ctrl.v $(source_dir)/SMM1_ctrl.v
 top_module = --top $(top_exe)
 synth_dir = synth
 synth = results

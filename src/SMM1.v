@@ -52,6 +52,8 @@ module SMM1
 
     wire [BLOCKSIZE - 1:0] M_wire [6:0];
 
+    wire load_TS, compute_M, compute_C, write_out;
+
     reg signed [BLOCKSIZE - 1:0] C [3:0];
     reg signed [BLOCKSIZE - 1:0] T [6:0];
     reg signed [BLOCKSIZE - 1:0] S [6:0];
@@ -75,6 +77,16 @@ module SMM1
                         : {B[BLOCK_11_UPPER -: BLOCKWIDTH], B[BLOCK_11_LOWER -: BLOCKWIDTH]};
 
    
+
+    SMM1_ctrl ctrl (
+        .clk(clk),
+        .rst(rst),
+        .load(load),
+        .load_TS(load_TS),
+        .compute_M(compute_M),
+        .compute_C(compute_C),
+        .write_out(write_out)
+    );
      
     // Load shift regiter ----------------------------------------------------------------------- //
     always @(posedge clk) begin
@@ -85,7 +97,7 @@ module SMM1
     // T Load and Addition ---------------------------------------------------------------------- //
     always @(posedge clk) begin
         if (rst) for (i = 0; i < 7; i = i + 1) T[i] <= 'b0;
-        else if (load) begin
+        else if (load_TS) begin
             if (!sel) begin 
                 T[0] <= mat_add(A_00, A_11);
                 T[1] <= mat_add(A_10, A_11);
@@ -110,7 +122,7 @@ module SMM1
     // S Load and Addition ---------------------------------------------------------------------- //
     always @(posedge clk) begin
         if (rst) for (j = 0; j < 7; j = j + 1) S[j] <= 'b0;
-        else if(load) begin
+        else if(load_TS) begin
             if (!sel) begin
                 S[0] <= mat_add(B_00, B_11);
                 S[1] <= B_00;
@@ -145,7 +157,7 @@ module SMM1
                 .rst(rst),
                 .A(T[i_gen]),
                 .B(S[i_gen]),
-                .load(load_shift[1]),
+                .load(compute_M),
                 .sel(sel),
                 .C_out(M_wire[i_gen])
             );
@@ -156,24 +168,27 @@ module SMM1
 
     // C Additions ------------------------------------------------------------------------------ //
     always @(posedge clk) begin
-        if (!sel) begin
-            C[0] <= mat_add(mat_sub(mat_add(M[0], M[3]), M[4]), M[6]); 
-            C[1] <= mat_add(M[2], M[4]); 
-            C[2] <= mat_add(M[1], M[3]); 
-            C[3] <= mat_add(mat_add(mat_sub(M[0], M[1]), M[2]), M[5]); 
-        end
-        else if (sel) begin
-            C[0] <= 'b0;
-            C[1] <= mat_add(M[2], M[4]); 
-            C[2] <= mat_add(M[1], M[3]); 
-            C[3] <= 'b0;
+        if (rst) for(i = 0; i < 4; i = i + 1) C[i] <= 'b0;
+        else if (compute_C) begin
+            if (!sel) begin
+                C[0] <= mat_add(mat_sub(mat_add(M[0], M[3]), M[4]), M[6]); 
+                C[1] <= mat_add(M[2], M[4]); 
+                C[2] <= mat_add(M[1], M[3]); 
+                C[3] <= mat_add(mat_add(mat_sub(M[0], M[1]), M[2]), M[5]); 
+            end
+            else if (sel) begin
+                C[0] <= 'b0;
+                C[1] <= mat_add(M[2], M[4]); 
+                C[2] <= mat_add(M[1], M[3]); 
+                C[3] <= 'b0;
+            end
         end
     end
 
     // Output Assignment ------------------------------------------------------------------------ //
     always @(posedge clk) begin
         if (rst) C_out <= 'b0;
-        else begin
+        else if (write_out) begin
             if (!sel) begin
                 {C_out[BLOCK_00_UPPER -: BLOCKWIDTH], C_out[BLOCK_00_LOWER -: BLOCKWIDTH]} <= C[0];
                 {C_out[BLOCK_01_UPPER -: BLOCKWIDTH], C_out[BLOCK_01_LOWER -: BLOCKWIDTH]} <= C[1];
