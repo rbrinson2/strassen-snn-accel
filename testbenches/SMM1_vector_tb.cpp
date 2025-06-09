@@ -18,11 +18,9 @@ void print_C(std::unique_ptr<VSMM1> &smm1);
 int main(int argc, char const *argv[])
 {
     arma::Mat<uint32_t> A = {{1,2,3,4},{5,6,7,8},{9,10,11,12},{13,14,15,16}};
-    arma::Mat<uint32_t> B = {{16,15,14,13},{12,11,10,9},{8,7,6,5},{4,3,2,1}};
-    arma::Col<uint32_t> B2(4, arma::fill::ones);
+    arma::Col<uint32_t> B(4, arma::fill::ones);
     arma::Mat<uint32_t> C(4, 4, arma::fill::zeros);
     arma::Mat<uint32_t> C2(4, 4, arma::fill::zeros);
-    arma::Mat<uint32_t> C3(4, 4, arma::fill::zeros);
 
     std::random_device rnd_device;
     std::mt19937 mersenne_engine {rnd_device()};  // Generates random integers
@@ -48,10 +46,7 @@ int main(int argc, char const *argv[])
 
 
     std::cout << "// ------------------------ Matrix x Vector -------------------------------------- //" << std::endl;
-    A = {{1,2,3,4},{5,6,7,8},{9,10,11,12},{13,14,15,16}};
-    B.zeros();
-    B.col(0) = {1,1,1,1};
-    for (int i = 0; i < 1; i++){
+    for (int i = 0; i < 10; i++){
         std::cout << "// ------------------------ Epoch " << i + 1 << " -------------------------------------- //" << std::endl;
 
 
@@ -81,10 +76,10 @@ int main(int argc, char const *argv[])
         print_B(smm1);
         std::cout << std::endl;
 
-        C = A * B2;
+        C = A * B;
         std::cout << "C1: \n" << C << std::endl;
-        fill_C(smm1, C3);
-        std::cout <<"C3: \n" << C3 << std::endl;
+        fill_C(smm1, C2);
+        std::cout <<"C2: \n" << C2 << std::endl;
 
         A.for_each([&](arma::Mat<uint32_t>::elem_type &val){ val = dist(mersenne_engine); });
         B.for_each([&](arma::Mat<uint32_t>::elem_type &val){ val = dist(mersenne_engine); });
@@ -118,7 +113,10 @@ void print_A(std::unique_ptr<VSMM1> &smm1){
 void fill_B(std::unique_ptr<VSMM1> &smm1, arma::Mat<uint32_t> b){
     for (int i = 0; i < 4; i++){
         for (int j = 0; j < 4; j++){
-            smm1->B[i * 4 + j] = b(i,j);
+            if ((i * 4 + j) % 4 == 0)
+                smm1->B[i * 4 + j] = b(i);
+            else
+                smm1->B[i * 4 + j] = 0;
         }
     }
 }

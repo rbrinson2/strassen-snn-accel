@@ -1,4 +1,5 @@
 
+
 module SMM1
 #(
     parameter DATAWIDTH = 32,
@@ -63,24 +64,34 @@ module SMM1
     assign A_11 = {A[BLOCK_11_UPPER -: BLOCKWIDTH], A[BLOCK_11_LOWER -: BLOCKWIDTH]};
     
     assign B_00 = {B[BLOCK_00_UPPER -: BLOCKWIDTH], B[BLOCK_00_LOWER -: BLOCKWIDTH]};
-    assign B_01 = {B[BLOCK_01_UPPER -: BLOCKWIDTH], B[BLOCK_01_LOWER -: BLOCKWIDTH]};
+    assign B_01 = sel ? {B[BLOCK_00_UPPER -: BLOCKWIDTH], B[BLOCK_00_LOWER -: BLOCKWIDTH]} 
+                        : {B[BLOCK_01_UPPER -: BLOCKWIDTH], B[BLOCK_01_LOWER -: BLOCKWIDTH]};
     assign B_10 = {B[BLOCK_10_UPPER -: BLOCKWIDTH], B[BLOCK_10_LOWER -: BLOCKWIDTH]};
-    assign B_11 = {B[BLOCK_11_UPPER -: BLOCKWIDTH], B[BLOCK_11_LOWER -: BLOCKWIDTH]};
+    assign B_11 = sel ? {B[BLOCK_10_UPPER -: BLOCKWIDTH], B[BLOCK_10_LOWER -: BLOCKWIDTH]}
+                        : {B[BLOCK_11_UPPER -: BLOCKWIDTH], B[BLOCK_11_LOWER -: BLOCKWIDTH]};
 
     
     // T Load and Addition ---------------------------------------------------------------------- //
     always @(posedge clk) begin
         if (rst) for (i = 0; i < 7; i = i + 1) T[i] <= 'b0;
         else if (load) begin
-            T[1] <= mat_add(A_10, A_11);
-            T[2] <= A_00;
-            T[3] <= A_11;
-            T[4] <= mat_add(A_00, A_01);
-
             if (!sel) begin 
                 T[0] <= mat_add(A_00, A_11);
+                T[1] <= mat_add(A_10, A_11);
+                T[2] <= A_00;
+                T[3] <= A_11;
+                T[4] <= mat_add(A_00, A_01);
                 T[5] <= mat_sub(A_10, A_00);
                 T[6] <= mat_sub(A_01, A_11); 
+            end
+            else if (sel) begin
+                T[0] <= 'b0;
+                T[1] <= mat_add(A_10, A_11);
+                T[2] <= A_00;
+                T[3] <= A_11;
+                T[4] <= mat_add(A_00, A_01);
+                T[5] <= 'b0;
+                T[6] <= 'b0;
             end
         end
     end
@@ -89,42 +100,23 @@ module SMM1
     always @(posedge clk) begin
         if (rst) for (j = 0; j < 7; j = j + 1) S[j] <= 'b0;
         else if(load) begin
-            case (sel)
-                0 : begin
-                    S[0] <= mat_add(B_00, B_11); 
-                    S[1] <= B_00;
-                    S[2] <= mat_sub(B_01, B_11);
-                    S[3] <= mat_sub(B_10, B_00);
-                    S[4] <= B_11;
-                    S[5] <= mat_add(B_00, B_01);
-                    S[6] <= mat_add(B_10, B_11);
-                end
-                1 : begin
-                    S[0] <= 'b0; 
-                    S[1] <= B_00;
-                    S[2] <= mat_sub(B_00, B_10);
-                    S[3] <= mat_sub(B_10, B_00);
-                    S[4] <= B_11;
-                    S[5] <= 'b0;
-                    S[6] <= 'b0;
-                end
-                default : begin
-                    S[0] <= 'b0; 
-                    S[1] <= 'b0;
-                    S[2] <= 'b0;
-                    S[3] <= 'b0;
-                    S[4] <= 'b0;
-                    S[5] <= 'b0;
-                    S[6] <= 'b0;
-                end
-            endcase
-            
-
             if (!sel) begin
+                S[0] <= mat_add(B_00, B_11);
+                S[1] <= B_00;
+                S[2] <= mat_sub(B_01, B_11);
+                S[3] <= mat_sub(B_10, B_00);
+                S[4] <= B_11;
+                S[5] <= mat_add(B_00, B_01);
+                S[6] <= mat_add(B_10, B_11);
             end
-            if ($time == 11) begin
-                $display("time: %0t, S0: 0x%0h, S1: 0x%0h, S2: 0x%0h, S3: 0x%0h, S4: 0x%0h, S5: 0x%0h, S6: 0x%0h",$time, S[0], S[1], S[2], S[3], S[4], S[5], S[6]);
-                $display("\t  B00: 0x%0h, B01: 0x%0h, B10: 0x%0h, B11: 0x%0h", B_00, B_01, B_10, B_11);
+            else if (sel) begin
+                S[0] <= 'b0; 
+                S[1] <= B_00;
+                S[2] <= mat_sub(B_01, B_11);
+                S[3] <= mat_sub(B_10, B_00);
+                S[4] <= B_11;
+                S[5] <= 'b0;
+                S[6] <= 'b0;
             end
         end
     end
@@ -144,26 +136,26 @@ module SMM1
                 .B(S[i_gen]),
                 .load(load),
                 .sel(sel),
-                .C_out(M[i_gen])
+                .C_out(M_wire[i_gen])
             );
+
+            assign M[i_gen] = M_wire[i_gen];
         end
     endgenerate
 
-    always begin
-        M[0] <= M_wire[0];
-        M[1] <= M_wire[1];
-        M[2] <= M_wire[2];
-        M[3] <= M_wire[3];
-    end    
-
     // C Additions ------------------------------------------------------------------------------ //
     always @(M) begin
-        C[1] <= mat_add(M[2], M[4]); 
-        C[2] <= mat_add(M[1], M[3]); 
-
         if (!sel) begin
             C[0] <= mat_add(mat_sub(mat_add(M[0], M[3]), M[4]), M[6]); 
+            C[1] <= mat_add(M[2], M[4]); 
+            C[2] <= mat_add(M[1], M[3]); 
             C[3] <= mat_add(mat_add(mat_sub(M[0], M[1]), M[2]), M[5]); 
+        end
+        else if (sel) begin
+            C[0] <= 'b0;
+            C[1] <= mat_add(M[2], M[4]); 
+            C[2] <= mat_add(M[1], M[3]); 
+            C[3] <= 'b0;
         end
     end
 
@@ -177,18 +169,19 @@ module SMM1
                 {C_out[BLOCK_10_UPPER -: BLOCKWIDTH], C_out[BLOCK_10_LOWER -: BLOCKWIDTH]} <= C[2];
                 {C_out[BLOCK_11_UPPER -: BLOCKWIDTH], C_out[BLOCK_11_LOWER -: BLOCKWIDTH]} <= C[3];
             end
-            else        
-                {C_out[BLOCK_00_UPPER -: BLOCKWIDTH], C_out[BLOCK_00_LOWER -: BLOCKWIDTH]} <= C[0];
-                {C_out[BLOCK_01_UPPER -: BLOCKWIDTH], C_out[BLOCK_01_LOWER -: BLOCKWIDTH]} <= C[1];
+            else if (sel) begin       
+                {C_out[BLOCK_00_UPPER -: BLOCKWIDTH], C_out[BLOCK_00_LOWER -: BLOCKWIDTH]} <= C[1];
+                {C_out[BLOCK_01_UPPER -: BLOCKWIDTH], C_out[BLOCK_01_LOWER -: BLOCKWIDTH]} <= C[0];
                 {C_out[BLOCK_10_UPPER -: BLOCKWIDTH], C_out[BLOCK_10_LOWER -: BLOCKWIDTH]} <= C[2];
                 {C_out[BLOCK_11_UPPER -: BLOCKWIDTH], C_out[BLOCK_11_LOWER -: BLOCKWIDTH]} <= C[3];
+            end
         end
     end
     
 
 
     // initial begin
-    //     $dumpfile("logs/mat_dump.vcd");
+    //     $dumpfile("logs/top_dump.vcd");
     //     $dumpvars();
     // end
     

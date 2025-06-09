@@ -85,6 +85,7 @@ int main(int argc, char const *argv[])
         // ------------- Matrix x Vector ------------- //
         else {
             smm0->sel = 1;
+
             // smm0->A = {A(0,0),A(0,1),A(1,0),A(1,1)};
             for (int i = 0; i < N; i++) 
                 for (int j = 0; j < M; j++)
@@ -93,14 +94,14 @@ int main(int argc, char const *argv[])
             // smm0->B = {B(0),B(0),B(1),B(1)};
             for (int i = 0; i < N; i++) 
                 for (int j = 0; j < M; j++)
-                    smm0->B.at(i * N + j) = B2(i);
+                    smm0->B.at(i * N) = B2(i);
 
             if (smm0->clk) { 
                 C = A * B2;
                 std::cout << "C1: \n"  << C << std::endl;
                 for (int i = 0; i < N; i++)
                     for (int j = 0; j < M; j++) 
-                        C2(i, j)  = smm0->C_out.at((N * M - 1) - (i * N + j));
+                        C2(i, j)  = smm0->C_out.at(i * M + j);
 
                 std::cout << "C2: \n" << C2 << std::endl;
             }
