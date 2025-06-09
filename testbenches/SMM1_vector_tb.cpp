@@ -46,44 +46,6 @@ int main(int argc, char const *argv[])
     smm1->sel = 0;
 
 
-    std::cout << "// ------------------------ Matrix x Matrix -------------------------------------- //" << std::endl;
-    for (int i = 0; i < 1; i++){
-        std::cout << "// ------------------------ Epoch " << i + 1 << " -------------------------------------- //" << std::endl;
-
-
-        contextp->time(0);
-        smm1->clk = 0;
-        smm1->rst = 0;
-
-        while (contextp->time() < 100)
-        {
-            contextp->timeInc(1);
-            smm1->clk = !smm1->clk;
-
-            // ---------- Reset Logic ---------- //
-            if (contextp->time() > 1 && contextp->time() < 4) smm1->rst = 1;
-            else smm1->rst = 0;
-
-            fill_A(smm1, A);
-            fill_B(smm1, B); 
-
-
-            smm1->eval();
-        }
-
-        print_A(smm1);
-        std::cout << std::endl;
-        print_B(smm1);
-        std::cout << std::endl;
-
-        C = A * B;
-        std::cout << "C1: \n" << C << std::endl;
-        fill_C(smm1, C2);
-        std::cout <<"C2: \n" << C2 << std::endl;
-
-        A.for_each([&](arma::Mat<uint32_t>::elem_type &val){ val = dist(mersenne_engine); });
-        B.for_each([&](arma::Mat<uint32_t>::elem_type &val){ val = dist(mersenne_engine); });
-    }
 
     std::cout << "// ------------------------ Matrix x Vector -------------------------------------- //" << std::endl;
     A = {{1,2,3,4},{5,6,7,8},{9,10,11,12},{13,14,15,16}};
