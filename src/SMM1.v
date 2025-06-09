@@ -55,6 +55,8 @@ module SMM1
     reg signed [BLOCKSIZE - 1:0] S [6:0];
     reg signed [BLOCKSIZE - 1:0] M [7];
 
+    reg [1:0] load_shift;
+
     integer i, j;
 
     // Wire Assignemeents ----------------------------------------------------------------------- //
@@ -70,7 +72,14 @@ module SMM1
     assign B_11 = sel ? {B[BLOCK_10_UPPER -: BLOCKWIDTH], B[BLOCK_10_LOWER -: BLOCKWIDTH]}
                         : {B[BLOCK_11_UPPER -: BLOCKWIDTH], B[BLOCK_11_LOWER -: BLOCKWIDTH]};
 
-    
+   
+     
+    // Load shift regiter ----------------------------------------------------------------------- //
+    always @(posedge clk) begin
+        if (rst) load_shift = 'b0;
+        else load_shift = {load_shift[0], load};
+    end
+
     // T Load and Addition ---------------------------------------------------------------------- //
     always @(posedge clk) begin
         if (rst) for (i = 0; i < 7; i = i + 1) T[i] <= 'b0;
@@ -134,7 +143,7 @@ module SMM1
                 .rst(rst),
                 .A(T[i_gen]),
                 .B(S[i_gen]),
-                .load(load),
+                .load(load_shift[1]),
                 .sel(sel),
                 .C_out(M_wire[i_gen])
             );
@@ -180,9 +189,9 @@ module SMM1
     
 
 
-    // initial begin
-    //     $dumpfile("logs/top_dump.vcd");
-    //     $dumpvars();
-    // end
+    initial begin
+        $dumpfile("logs/top_dump.vcd");
+        $dumpvars();
+    end
     
 endmodule

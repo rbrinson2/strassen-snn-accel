@@ -40,12 +40,12 @@ int main(int argc, char const *argv[])
     smm1->B = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     smm1->clk = 0;
     smm1->rst = 0;
-    smm1->load = 1;
+    smm1->load = 0;
     smm1->sel = 0;
 
 
     std::cout << "// ------------------------ Matrix x Matrix -------------------------------------- //" << std::endl;
-    for (int i = 0; i < 10; i++){
+    for (int i = 0; i < 1; i++){
         std::cout << "// ------------------------ Epoch " << i + 1 << " -------------------------------------- //" << std::endl;
 
 
@@ -61,6 +61,9 @@ int main(int argc, char const *argv[])
             // ---------- Reset Logic ---------- //
             if (contextp->time() > 1 && contextp->time() < 4) smm1->rst = 1;
             else smm1->rst = 0;
+
+            if (contextp->time() >=3 && contextp->time() < 6) smm1->load = 1;
+            else smm1->load = 0;
 
             fill_A(smm1, A);
             fill_B(smm1, B); 
