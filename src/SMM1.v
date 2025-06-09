@@ -2,7 +2,9 @@
 
 module SMM1
 #(
-    parameter DATAWIDTH = 32
+    parameter DATAWIDTH = 32,
+    parameter BLOCKSIZE = DATAWIDTH * 4,
+    parameter BUSWIDTH = BLOCKSIZE * 4
 )    
 (
     // Inputs ----------------------------------------------------------------------------------- //
@@ -14,6 +16,13 @@ module SMM1
     output reg [BUSWIDTH - 1 :0] C_out
 
 );
+  
+
+    // Local Parameters ------------------------------------------------------------------------- //
+    localparam BLOCKWIDTH = DATAWIDTH * 2;
+    localparam BLOCK_00_UPPER = BLOCKWIDTH * 3 - 1, BLOCK_01_UPPER = BLOCKWIDTH * 4 -  1, BLOCK_10_UPPER = BLOCKWIDTH * 7 - 1, BLOCK_11_UPPER = BLOCKWIDTH * 8 - 1; 
+    localparam BLOCK_00_LOWER = BLOCKWIDTH * 1 - 1, BLOCK_01_LOWER = BLOCKWIDTH * 2 -  1, BLOCK_10_LOWER = BLOCKWIDTH * 5 - 1, BLOCK_11_LOWER = BLOCKWIDTH * 6 - 1; 
+
     // Function ----------------------------------------------------------------- Matrix Addition //
     function automatic [BLOCKSIZE - 1 : 0] mat_add (input [BLOCKSIZE - 1 : 0] a, b);
         integer i;
@@ -28,15 +37,8 @@ module SMM1
         for (i = 0; i < BLOCKSIZE / DATAWIDTH; i = i + 1) begin
             mat_sub[i * DATAWIDTH +: DATAWIDTH] = a[i * DATAWIDTH +: DATAWIDTH] - b[i * DATAWIDTH +: DATAWIDTH];
         end
-    endfunction   
-
-    // Local Parameters ------------------------------------------------------------------------- //
-    localparam BLOCKSIZE = DATAWIDTH * 4;
-    localparam BUSWIDTH = BLOCKSIZE * 4;
-    localparam BLOCKWIDTH = DATAWIDTH * 2;
-    localparam BLOCK_00_UPPER = BLOCKWIDTH * 3 - 1, BLOCK_01_UPPER = BLOCKWIDTH * 4 -  1, BLOCK_10_UPPER = BLOCKWIDTH * 7 - 1, BLOCK_11_UPPER = BLOCKWIDTH * 8 - 1; 
-    localparam BLOCK_00_LOWER = BLOCKWIDTH * 1 - 1, BLOCK_01_LOWER = BLOCKWIDTH * 2 -  1, BLOCK_10_LOWER = BLOCKWIDTH * 5 - 1, BLOCK_11_LOWER = BLOCKWIDTH * 6 - 1; 
-
+    endfunction 
+    
     // Local Variables -------------------------------------------------------------------------- //
     wire [BLOCKSIZE - 1:0] A_00;
     wire [BLOCKSIZE - 1:0] A_01;
@@ -48,7 +50,7 @@ module SMM1
     wire [BLOCKSIZE - 1:0] B_10;
     wire [BLOCKSIZE - 1:0] B_11;
 
-    wire [BLOCKSIZE - 1:0] M_wire [7:0];
+    wire [BLOCKSIZE - 1:0] M_wire [6:0];
 
     reg signed [BLOCKSIZE - 1:0] C [3:0];
     reg signed [BLOCKSIZE - 1:0] T [6:0];
@@ -135,7 +137,9 @@ module SMM1
     generate
         for (i_gen = 0; i_gen < 7; i_gen = i_gen + 1) begin : multiply
             SMM0 #(
-                .DATAWIDTH()
+                .DATAWIDTH(),
+                .BLOCKSIZE(),
+                .BUSWIDTH()
             ) SMM0_instance (
                 .clk(clk),
                 .rst(rst),
