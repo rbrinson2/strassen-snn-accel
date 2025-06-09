@@ -2,9 +2,7 @@
 
 module SMM1
 #(
-    parameter DATAWIDTH = 32,
-    parameter BLOCKSIZE = DATAWIDTH * 4,
-    parameter BUSWIDTH = BLOCKSIZE * 4
+    parameter DATAWIDTH = 32
 )    
 (
     // Inputs ----------------------------------------------------------------------------------- //
@@ -33,6 +31,8 @@ module SMM1
     endfunction   
 
     // Local Parameters ------------------------------------------------------------------------- //
+    localparam BLOCKSIZE = DATAWIDTH * 4;
+    localparam BUSWIDTH = BLOCKSIZE * 4;
     localparam BLOCKWIDTH = DATAWIDTH * 2;
     localparam BLOCK_00_UPPER = BLOCKWIDTH * 3 - 1, BLOCK_01_UPPER = BLOCKWIDTH * 4 -  1, BLOCK_10_UPPER = BLOCKWIDTH * 7 - 1, BLOCK_11_UPPER = BLOCKWIDTH * 8 - 1; 
     localparam BLOCK_00_LOWER = BLOCKWIDTH * 1 - 1, BLOCK_01_LOWER = BLOCKWIDTH * 2 -  1, BLOCK_10_LOWER = BLOCKWIDTH * 5 - 1, BLOCK_11_LOWER = BLOCKWIDTH * 6 - 1; 
@@ -53,7 +53,7 @@ module SMM1
     reg signed [BLOCKSIZE - 1:0] C [3:0];
     reg signed [BLOCKSIZE - 1:0] T [6:0];
     reg signed [BLOCKSIZE - 1:0] S [6:0];
-    reg signed [BLOCKSIZE - 1:0] M [7];
+    reg signed [BLOCKSIZE - 1:0] M [6:0];
 
     reg [1:0] load_shift;
 
