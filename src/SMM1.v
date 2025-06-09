@@ -148,7 +148,7 @@ module SMM1
                 .C_out(M_wire[i_gen])
             );
 
-            assign M[i_gen] = M_wire[i_gen];
+            always @(M_wire) M[i_gen] <= M_wire[i_gen];
         end
     endgenerate
 
