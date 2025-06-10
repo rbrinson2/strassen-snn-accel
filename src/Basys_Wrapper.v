@@ -25,20 +25,35 @@ module Basys_Wrapper(
 
     output reg [15:0] led
 );
-    localparam DATAWIDTH = 32;
+    localparam DATAWIDTH = 8;
+
+    reg [15:0] btnC_debounnce;
+    reg btnC_stable;
+
+    always @(posedge clk) begin
+        btnC_debounnce = {btnC_debounnce[14:0], btnC};
+        btnC_stable = btnC_debounnce[15];
+    end
     
-    localparam [DATAWIDTH * 16 - 1:0] A = {
-        32'h16,32'h15,32'h14,32'h13,
-        32'h12,32'h11,32'h10,32'h9,
-        32'h8,32'h7,32'h6,32'h5,
-        32'h4,32'h3,32'h2,32'h1
-    };
-    localparam [DATAWIDTH * 16 - 1:0] B = {
-        32'h1,32'h2,32'h3,32'h4,
-        32'h5,32'h6,32'h7,32'h8,
-        32'h9,32'h10,32'h11,32'h12,
-        32'h13,32'h14,32'h15,32'h16
-    };
+    reg [DATAWIDTH * 16 - 1:0] W_r;
+    reg [DATAWIDTH * 16 - 1:0] S;
+
+    initial begin
+        W_r = {
+            8'd0, 8'd0, 8'd0, 8'd2,
+            8'd2, 8'd0, 8'd0, 8'd0,
+            8'd0, 8'd2, 8'd0, 8'd0, 
+            8'd0, 8'd0, 8'd2, 8'd0
+        };
+        S = {
+            8'd0, 8'd0, 8'd0, 8'd1,
+            8'd0, 8'd0, 8'd0, 8'd1,
+            8'd0, 8'd0, 8'd0, 8'd1, 
+            8'd0, 8'd0, 8'd0, 8'd1
+        };
+
+    end
+    
     
     reg [DATAWIDTH - 1 : 0] C [15:0];
     wire [DATAWIDTH * 16 - 1 : 0] C_wire;
@@ -50,26 +65,22 @@ module Basys_Wrapper(
     ) SMM1_instance (
         .clk(clk),
         .rst(btnU),
-        .A(A),
-        .B(B),
-        .load(btnC),
-        .sel(sw),
+        .A(W_r),
+        .B(S),
+        .load(btnC_stable),
+        .sel(1'b1),
         .C_out(C_wire)
     );
 
     integer j;
-    always @(*) begin
+    always @(posedge clk) begin
         for (j = 0; j < 16; j = j + 1) begin
             C[j] <= C_wire[j * DATAWIDTH +: DATAWIDTH];
         end
     end
     
-    integer i;
     always @(posedge clk) begin
-        for (i = 0; i < 16; i = i + 1) begin
-            if (C[i] >= 32'd1) led[i] <= 1'b1;
-            else led[i] <= 1'b0;
-        end
+        led = C[0];
     end
 
 

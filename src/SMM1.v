@@ -59,8 +59,6 @@ module SMM1
     reg signed [BLOCKSIZE - 1:0] S [6:0];
     reg signed [BLOCKSIZE - 1:0] M [6:0];
 
-    reg [1:0] load_shift;
-
     integer i, j;
 
     // Wire Assignemeents ----------------------------------------------------------------------- //
@@ -88,11 +86,6 @@ module SMM1
         .write_out(write_out)
     );
      
-    // Load shift regiter ----------------------------------------------------------------------- //
-    always @(posedge clk) begin
-        if (rst) load_shift = 'b0;
-        else load_shift = {load_shift[0], load};
-    end
 
     // T Load and Addition ---------------------------------------------------------------------- //
     always @(posedge clk) begin
