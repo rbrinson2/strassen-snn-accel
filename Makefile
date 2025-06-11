@@ -6,7 +6,7 @@ top_module = --top $(top_exe)
 synth_dir = synth
 synth = results
 route_dir = route
-testbenches = testbenches/$(top_exe)_matrix_tb.cpp
+testbenches = testbenches/$(top_exe)_large_vector_tb.cpp
 
 flags = -cc --exe -x-assign fast --trace --build -j 0 -Wno-fatal 
 
@@ -25,7 +25,7 @@ testbench:
 	obj_dir/V$(top_exe) +trace
 
 	# --------------------------------------------- GTKWave
-	gtkwave logs/top_dump.vcd
+	# gtkwave logs/top_dump.vcd
 
 .PHONEY: clean
 clean:
