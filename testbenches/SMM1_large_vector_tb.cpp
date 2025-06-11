@@ -7,7 +7,7 @@
 #define N 2
 #define M N
 #define THETA 4
-#define ALPHA 2
+#define ALPHA 1.5
 
 arma::Mat<int32_t> weights_walk() {
     arma::Mat<int32_t> w_w(12, 12, arma::fill::zeros);
