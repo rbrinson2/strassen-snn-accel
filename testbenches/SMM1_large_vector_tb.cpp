@@ -6,23 +6,23 @@
 
 #define N 2
 #define M N
-#define THETA 4
+#define THETA 1
 #define ALPHA 1.5
 
 arma::Mat<int32_t> weights_walk() {
     arma::Mat<int32_t> w_w(12, 12, arma::fill::zeros);
-    w_w(0, 7) = 1;
-    w_w(1, arma::span(6,11)) = {-1,1,0,1,-1,1};
-    w_w(2, 9) = 1;
-    w_w(3, 10) = 1;
-    w_w(4, 11) = 1;
-    w_w(5, 6) = 1;
-    w_w(6, 11) = 1;
-    w_w(7, 6) = 1;
-    w_w(8, 7) = 1;
-    w_w(9, arma::span(6,11)) = {-1,1,0,1,-1,1};
-    w_w(10, 9) = 1;
-    w_w(11, 10) = 1;
+    w_w(0, 9) = 2;
+    w_w(1, 10) = 2;
+    w_w(2, 11) = 2;
+    w_w(3, 8) = 2;
+    w_w(4, 9) = 2;
+    w_w(5, 10) = 2;
+    w_w(6, 11) = 2;
+    w_w(7, 8) = 2;
+    w_w(8, 9) = 2;
+    w_w(9, 10) = 2;
+    w_w(10, 11) = 2;
+    w_w(11, 8) = 2;
 
     return w_w;
 }
@@ -336,11 +336,13 @@ int main(int argc, char const *argv[])
                 C(i) = 0;
                 B(i) = 1;
             }
+            else B(i) = 0;
 
             if (V(i) > THETA) {
                 V(i) = 0;
                 S(i) = 1;
             } 
+            else S(i) = 0;
         }
 
     }
