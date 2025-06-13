@@ -105,7 +105,7 @@ int main(int argc, char const *argv[]) {
 
     std::cout << "// ------------------------ Matrix x Vector -------------------------------------- //" << std::endl;
     
-    for (int epoch = 0; epoch < 20; epoch++) {
+    for (int epoch = 0; epoch < 200; epoch++) {
         std::cout << "// ------------------------ Epoch " << epoch + 1 << " -------------------------------------- //" << std::endl;
 
         contextp->time(0);
