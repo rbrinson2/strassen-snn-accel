@@ -87,6 +87,7 @@ int main(int argc, char const *argv[]) {
     contextp->randReset(2);
     contextp->traceEverOn(true);
     contextp->commandArgs(argc, argv);
+    contextp->timeunit(-6);
 
     // Create and initialize modules
     std::vector<std::unique_ptr<VSMM1>> smm_modules;
@@ -108,7 +109,7 @@ int main(int argc, char const *argv[]) {
     for (int epoch = 0; epoch < 1; epoch++) {
         std::cout << "// ------------------------ Epoch " << epoch + 1 << " -------------------------------------- //" << std::endl;
 
-        contextp->time(0);
+        //contextp->time(0);
         set_control_signals(smm_modules, 0, 0, 0, 1);
 
         // Write data to modules

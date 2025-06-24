@@ -1,4 +1,5 @@
 
+`timescale 1ns / 1ps
 
 module SMM1
 #(
@@ -199,9 +200,9 @@ module SMM1
     
 
 
-    // initial begin
-    //     $dumpfile("logs/top_dump.vcd");
-    //     $dumpvars();
-    // end
+    initial begin
+        $dumpfile("logs/top_dump.vcd");
+        $dumpvars();
+    end
     
 endmodule

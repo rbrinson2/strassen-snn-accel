@@ -34,6 +34,7 @@ int main(int argc, char const *argv[])
     contextp->randReset(2);
     contextp->traceEverOn(true);
     contextp->commandArgs(argc, argv);
+    contextp->timeunit(-3);
 
     std::unique_ptr<VSMM1> smm1_0{new VSMM1{contextp.get(), "TOP"}};
     std::unique_ptr<VSMM1> smm1_1{new VSMM1{contextp.get(), "TOP"}};
@@ -54,11 +55,10 @@ int main(int argc, char const *argv[])
     smm1_1->sel = 0;
 
     std::cout << "// ------------------------ Matrix x Vector -------------------------------------- //" << std::endl;
-    for (int i = 0; i < 1; i++){
+    for (int i = 0; i < 3; i++){
         std::cout << "// ------------------------ Epoch " << i + 1 << " -------------------------------------- //" << std::endl;
 
-
-        contextp->time(0);
+        // contextp->time(0);
         smm1_0->clk = 0;
         smm1_0->rst = 0;
         smm1_0->sel = 1;
