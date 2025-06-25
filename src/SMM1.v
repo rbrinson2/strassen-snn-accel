@@ -200,9 +200,9 @@ module SMM1
     
 
 
-    initial begin
-        $dumpfile("logs/top_dump.vcd");
-        $dumpvars();
-    end
+    // initial begin
+    //     $dumpfile("logs/top_dump.vcd");
+    //     $dumpvars();
+    // end
     
 endmodule

@@ -87,7 +87,6 @@ int main(int argc, char const *argv[]) {
     contextp->randReset(2);
     contextp->traceEverOn(true);
     contextp->commandArgs(argc, argv);
-    contextp->timeunit(-6);
 
     // Create and initialize modules
     std::vector<std::unique_ptr<VSMM1>> smm_modules;
@@ -107,7 +106,8 @@ int main(int argc, char const *argv[]) {
     std::cout << "// ------------------------ Matrix x Vector -------------------------------------- //" << std::endl;
     
     for (int epoch = 0; epoch < 1; epoch++) {
-        std::cout << "// ------------------------ Epoch " << epoch + 1 << " -------------------------------------- //" << std::endl;
+        contextp->timeprecision(9);
+        std::cout << "// ------------------------ Epoch " << epoch + 1 << " -------------------------------------- //" << contextp->timeprecision() << std::endl;
 
         //contextp->time(0);
         set_control_signals(smm_modules, 0, 0, 0, 1);
@@ -120,13 +120,13 @@ int main(int argc, char const *argv[]) {
         }
 
         // Simulation loop
-        while (contextp->time() < 25) {
-            contextp->timeInc(1);
+        while (contextp->time() < 1000) {
+            contextp->timeInc(5);
             toggle_clocks(smm_modules);
 
             // Reset logic
-            int rst_val = (contextp->time() > 1 && contextp->time() < 4) ? 1 : 0;
-            int load_val = (contextp->time() >= 3 && contextp->time() < 6) ? 1 : 0;
+            int rst_val = (contextp->time() > 1 && contextp->time() < 20) ? 1 : 0;
+            int load_val = (contextp->time() >= 3 && contextp->time() < 30) ? 1 : 0;
             
             for (auto& module : smm_modules) {
                 module->rst = rst_val;
